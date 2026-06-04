@@ -1,0 +1,13 @@
+requests
+pandas
+numpy
+transformers
+torch
+scikit-learn
+spacy
+matplotlib
+seaborn
+wordcloud
+streamlit
+jupyter
+optuna
