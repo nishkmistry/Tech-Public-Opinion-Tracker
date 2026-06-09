@@ -1,0 +1,54 @@
+name: Scheduled Data Scraping & ML Pipeline
+
+on:
+  schedule:
+    - cron: '0 0 * * 0'
+  workflow_dispatch:
+
+jobs:
+  run-pipeline:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.10'
+        cache: 'pip'
+
+    - name: Install Dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        python -m spacy download en_core_web_sm
+
+    - name: Run Reddit Scraper
+      run: |
+        # Updated to reflect the new directory
+        python Reddit_Scraper/reddit_scraper.py
+
+    - name: Execute NLP & ML Pipeline Notebooks
+      run: |
+        # Updated 'notebooks' to 'Notebooks' to match your folder capitalization
+        jupyter nbconvert --to notebook --execute --inplace Notebooks/Cleaning.ipynb
+        jupyter nbconvert --to notebook --execute --inplace Notebooks/Sentiment_analysis.ipynb
+        jupyter nbconvert --to notebook --execute --inplace Notebooks/nlp_features.ipynb
+        jupyter nbconvert --to notebook --execute --inplace Notebooks/feature_engineering.ipynb
+        jupyter nbconvert --to notebook --execute --inplace Notebooks/Virality.ipynb
+        jupyter nbconvert --to notebook --execute --inplace Notebooks/EDA_storytelling.ipynb
+
+    - name: Commit and Push Updated Data & Metrics
+      run: |
+        git config --local user.email "github-actions[bot]@users.noreply.github.com"
+        git config --local user.name "github-actions[bot]"
+        
+        # Stages the data directory for commit
+        git add data/
+        
+        git commit -m "Automated pipeline run: Updated data & insights $(date -u +'%Y-%m-%d %H:%M:%S' UTC)" || echo "No changes detected in data matrix."
+        git push
