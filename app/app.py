@@ -5,16 +5,16 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 from wordcloud import WordCloud, STOPWORDS
 import warnings
+
 warnings.filterwarnings("ignore")
 
 # ─────────────────────────────────────────────
 # PAGE CONFIG
 # ─────────────────────────────────────────────
 st.set_page_config(
-    page_title="Tech Public Opinion Tracker",
-    page_icon="🔍",
-    layout="wide"
+    page_title="Tech Public Opinion Tracker", page_icon="🔍", layout="wide"
 )
+
 
 # ─────────────────────────────────────────────
 # LOAD DATA
@@ -22,19 +22,22 @@ st.set_page_config(
 @st.cache_data
 def load_data():
     df = pd.read_csv("data/nlp_posts.csv")
-    df = df.rename(columns={
-        "Dominant_topics" : "dominant_topic",
-        "topic_confidance": "topic_confidence",
-        "Topic_labels"    : "topic_label"
-    })
-    threshold   = df["score"].quantile(0.75)
+    df = df.rename(
+        columns={
+            "Dominant_topics": "dominant_topic",
+            "topic_confidance": "topic_confidence",
+            "Topic_labels": "topic_label",
+        }
+    )
+    threshold = df["score"].quantile(0.75)
     df["viral"] = (df["score"] > threshold).astype(int)
     df["created_utc"] = pd.to_datetime(df["created_utc"])
-    df["hour"]        = df["created_utc"].dt.hour
+    df["hour"] = df["created_utc"].dt.hour
     df["day_of_week"] = df["created_utc"].dt.dayofweek
-    df["day_name"]    = df["created_utc"].dt.day_name()
-    df["is_weekend"]  = (df["day_of_week"] >= 5).astype(int)
+    df["day_name"] = df["created_utc"].dt.day_name()
+    df["is_weekend"] = (df["day_of_week"] >= 5).astype(int)
     return df
+
 
 df = load_data()
 
@@ -47,19 +50,19 @@ st.sidebar.markdown("Use filters to explore the dataset")
 selected_sentiment = st.sidebar.multiselect(
     "Filter by Sentiment",
     options=df["sentiment"].unique().tolist(),
-    default=df["sentiment"].unique().tolist()
+    default=df["sentiment"].unique().tolist(),
 )
 
 selected_topics = st.sidebar.multiselect(
     "Filter by Topic",
     options=df["topic_label"].unique().tolist(),
-    default=df["topic_label"].unique().tolist()
+    default=df["topic_label"].unique().tolist(),
 )
 
 # apply filters
 filtered_df = df[
-    (df["sentiment"].isin(selected_sentiment)) &
-    (df["topic_label"].isin(selected_topics))
+    (df["sentiment"].isin(selected_sentiment))
+    & (df["topic_label"].isin(selected_topics))
 ]
 
 st.sidebar.markdown("---")
@@ -70,7 +73,9 @@ st.sidebar.markdown(f"**Posts shown:** {len(filtered_df)} / {len(df)}")
 # ─────────────────────────────────────────────
 st.title("🔍 Tech Public Opinion Tracker")
 st.markdown("### How does Reddit's tech community feel about technology?")
-st.markdown("An NLP analysis of **2091 posts** from r/technology — sentiment, topics, virality, and named entities.")
+st.markdown(
+    "An NLP analysis of **2091 posts** from r/technology — sentiment, topics, virality, and named entities."
+)
 st.markdown("---")
 
 # ─────────────────────────────────────────────
@@ -80,26 +85,19 @@ st.subheader("📌 Key Findings")
 
 col1, col2, col3, col4 = st.columns(4)
 
-col1.metric(
-    label="Total Posts Analyzed",
-    value="2,091"
-)
+col1.metric(label="Total Posts Analyzed", value="2,091")
 col2.metric(
     label="Negative Sentiment",
     value="62.7%",
     delta="overwhelmingly critical",
-    delta_color="inverse"
+    delta_color="inverse",
 )
-col3.metric(
-    label="Best Model ROC AUC",
-    value="0.7833",
-    delta="Logistic Regression"
-)
+col3.metric(label="Best Model ROC AUC", value="0.7833", delta="Logistic Regression")
 col4.metric(
     label="Negative Posts Viral Rate",
     value="27.4%",
     delta="vs 16.8% positive",
-    delta_color="inverse"
+    delta_color="inverse",
 )
 
 st.markdown("---")
@@ -117,8 +115,11 @@ with col1:
 
     fig, ax = plt.subplots(figsize=(6, 4))
     sns.barplot(
-        data=sentiment_counts, x="sentiment", y="count",
-        palette=["#e74c3c", "#95a5a6", "#2ecc71"], ax=ax
+        data=sentiment_counts,
+        x="sentiment",
+        y="count",
+        palette=["#e74c3c", "#95a5a6", "#2ecc71"],
+        ax=ax,
     )
     ax.set_title("Sentiment Distribution")
     ax.set_xlabel("Sentiment")
@@ -132,8 +133,11 @@ with col2:
 
     fig, ax = plt.subplots(figsize=(6, 4))
     sns.barplot(
-        data=viral_sentiment, x="sentiment", y="viral_pct",
-        palette=["#e74c3c", "#95a5a6", "#2ecc71"], ax=ax
+        data=viral_sentiment,
+        x="sentiment",
+        y="viral_pct",
+        palette=["#e74c3c", "#95a5a6", "#2ecc71"],
+        ax=ax,
     )
     ax.axhline(25, color="black", linestyle="--", label="average (25%)")
     ax.set_title("Viral Rate by Sentiment")
@@ -157,10 +161,7 @@ with col1:
     topic_counts.columns = ["topic", "count"]
 
     fig, ax = plt.subplots(figsize=(7, 5))
-    sns.barplot(
-        data=topic_counts, y="topic", x="count",
-        palette="Set2", ax=ax
-    )
+    sns.barplot(data=topic_counts, y="topic", x="count", palette="Set2", ax=ax)
     ax.set_title("Topic Distribution")
     ax.set_xlabel("Number of Posts")
     ax.set_ylabel("")
@@ -174,8 +175,7 @@ with col2:
 
     fig, ax = plt.subplots(figsize=(7, 5))
     sns.barplot(
-        data=viral_topic, y="topic_label", x="viral_pct",
-        palette="Blues_d", ax=ax
+        data=viral_topic, y="topic_label", x="viral_pct", palette="Blues_d", ax=ax
     )
     ax.axvline(25, color="red", linestyle="--", label="average (25%)")
     ax.set_title("Viral Rate by Topic")
@@ -200,8 +200,13 @@ with col1:
 
     fig, ax = plt.subplots(figsize=(7, 4))
     sns.lineplot(
-        data=viral_hour, x="hour", y="viral_pct",
-        color="red", linewidth=2, marker="o", ax=ax
+        data=viral_hour,
+        x="hour",
+        y="viral_pct",
+        color="red",
+        linewidth=2,
+        marker="o",
+        ax=ax,
     )
     ax.axhline(25, color="black", linestyle="--", label="average (25%)")
     ax.set_title("Viral Rate by Hour of Day (UTC)")
@@ -212,8 +217,15 @@ with col1:
     plt.close()
 
 with col2:
-    day_order = ["Monday", "Tuesday", "Wednesday",
-                 "Thursday", "Friday", "Saturday", "Sunday"]
+    day_order = [
+        "Monday",
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Friday",
+        "Saturday",
+        "Sunday",
+    ]
     pivot = filtered_df.groupby(["day_name", "hour"]).size().unstack(fill_value=0)
     pivot = pivot.reindex([d for d in day_order if d in pivot.index])
 
@@ -222,10 +234,7 @@ with col2:
         st.info("Not enough data to show heatmap with current filters.")
     else:
         fig, ax = plt.subplots(figsize=(7, 4))
-        sns.heatmap(
-            pivot, cmap="YlOrRd",
-            linewidths=0.3, linecolor="white", ax=ax
-        )
+        sns.heatmap(pivot, cmap="YlOrRd", linewidths=0.3, linecolor="white", ax=ax)
         ax.set_title("Post Activity - Day vs Hour (UTC)")
         ax.set_xlabel("Hour")
         ax.set_ylabel("")
@@ -239,22 +248,60 @@ st.markdown("---")
 # ─────────────────────────────────────────────
 st.subheader("☁️ Word Clouds by Sentiment")
 
-custom_stopwords = STOPWORDS.union({
-    "will", "also", "one", "new", "say", "said",
-    "use", "just", "like", "get", "got", "go",
-    "make", "way", "time", "year", "day", "now",
-    "that", "this", "they", "them", "their",
-    "have", "has", "had", "would", "could", "should",
-    "people", "us", "we", "our", "your", "my",
-    "don", "it", "re", "ve", "ll", "doesn", "isn",
-    "s", "u", "t", "i", "m", "b"
-})
+custom_stopwords = STOPWORDS.union(
+    {
+        "will",
+        "also",
+        "one",
+        "new",
+        "say",
+        "said",
+        "use",
+        "just",
+        "like",
+        "get",
+        "got",
+        "go",
+        "make",
+        "way",
+        "time",
+        "year",
+        "day",
+        "now",
+        "that",
+        "this",
+        "they",
+        "them",
+        "their",
+        "have",
+        "has",
+        "had",
+        "would",
+        "could",
+        "should",
+        "people",
+        "us",
+        "we",
+        "our",
+        "your",
+        "my",
+        "don",
+        "it",
+        "re",
+        "ve",
+        "ll",
+        "doesn",
+        "isn",
+        "s",
+        "u",
+        "t",
+        "i",
+        "m",
+        "b",
+    }
+)
 
-sentiment_colors = {
-    "positive": "Greens",
-    "neutral":  "Greys",
-    "negative": "Reds"
-}
+sentiment_colors = {"positive": "Greens", "neutral": "Greys", "negative": "Reds"}
 
 col1, col2, col3 = st.columns(3)
 cols = [col1, col2, col3]
@@ -264,11 +311,12 @@ for col, sentiment in zip(cols, ["positive", "neutral", "negative"]):
     if len(subset) > 0:
         text = " ".join(subset.values)
         wc = WordCloud(
-            width=400, height=300,
+            width=400,
+            height=300,
             background_color="white",
             colormap=sentiment_colors[sentiment],
             max_words=60,
-            stopwords=custom_stopwords
+            stopwords=custom_stopwords,
         ).generate(text)
 
         fig, ax = plt.subplots(figsize=(5, 4))
@@ -291,10 +339,7 @@ for _, row in filtered_df.iterrows():
         for org in row["orgs"].split(" | "):
             org = org.strip()
             if len(org) > 2:
-                all_orgs.append({
-                    "org":       org,
-                    "sentiment": row["sentiment"]
-                })
+                all_orgs.append({"org": org, "sentiment": row["sentiment"]})
 
 if all_orgs:
     orgs_df = pd.DataFrame(all_orgs)
@@ -303,9 +348,12 @@ if all_orgs:
 
     fig, ax = plt.subplots(figsize=(10, 5))
     sns.countplot(
-        data=orgs_filtered, y="org", hue="sentiment",
+        data=orgs_filtered,
+        y="org",
+        hue="sentiment",
         palette=["#e74c3c", "#95a5a6", "#2ecc71"],
-        order=top_orgs, ax=ax
+        order=top_orgs,
+        ax=ax,
     )
     ax.set_title("Top 10 Companies — Sentiment Breakdown")
     ax.set_xlabel("Number of Mentions")
@@ -324,13 +372,11 @@ st.subheader("📋 Explore Posts")
 col1, col2 = st.columns(2)
 with col1:
     sentiment_filter = st.selectbox(
-        "Filter by sentiment",
-        ["all"] + df["sentiment"].unique().tolist()
+        "Filter by sentiment", ["all"] + df["sentiment"].unique().tolist()
     )
 with col2:
     viral_filter = st.selectbox(
-        "Filter by virality",
-        ["all", "viral only", "not viral only"]
+        "Filter by virality", ["all", "viral only", "not viral only"]
     )
 
 # use df not filtered_df — independent of sidebar filters
@@ -344,12 +390,11 @@ elif viral_filter == "not viral only":
     explore_df = explore_df[explore_df["viral"] == 0]
 
 st.dataframe(
-    explore_df[["title", "sentiment", "confidence",
-                "topic_label", "score", "viral"]]
+    explore_df[["title", "sentiment", "confidence", "topic_label", "score", "viral"]]
     .sort_values("score", ascending=False)
     .head(50)
     .reset_index(drop=True),
-    use_container_width=True
+    use_container_width=True,
 )
 st.markdown("---")
 st.markdown("Built by Vansh Agarwal and Nishk Mistry · VIT Chennai · 2025")
@@ -360,21 +405,22 @@ st.markdown("---")
 # SECTION 8 — VIRALITY PREDICTOR
 # ─────────────────────────────────────────────
 st.subheader("🚀 Will Your Post Go Viral?")
-st.markdown("Enter a post title and see how it compares to viral posts on r/technology.")
+st.markdown(
+    "Enter a post title and see how it compares to viral posts on r/technology."
+)
 
 user_title = st.text_input(
     "Enter your post title:",
-    placeholder="e.g. Google announces new AI model that replaces developers"
+    placeholder="e.g. Google announces new AI model that replaces developers",
 )
 
 post_hour = st.slider("What hour will you post? (UTC)", 0, 23, 16)
-post_day  = st.selectbox(
+post_day = st.selectbox(
     "What day will you post?",
-    ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
+    ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"],
 )
 post_flair = st.selectbox(
-    "Select a flair:",
-    sorted(df["topic_label"].unique().tolist())
+    "Select a flair:", sorted(df["topic_label"].unique().tolist())
 )
 
 if st.button("Predict Virality 🔮"):
@@ -422,9 +468,21 @@ if st.button("Predict Virality 🔮"):
 
         # keywords that appear in viral posts
         viral_keywords = [
-            "google", "apple", "ai", "privacy", "government",
-            "ban", "data", "billion", "facebook", "net neutrality",
-            "security", "hack", "leak", "fcc", "law"
+            "google",
+            "apple",
+            "ai",
+            "privacy",
+            "government",
+            "ban",
+            "data",
+            "billion",
+            "facebook",
+            "net neutrality",
+            "security",
+            "hack",
+            "leak",
+            "fcc",
+            "law",
         ]
         matched = [kw for kw in viral_keywords if kw.lower() in user_title.lower()]
         if matched:
@@ -452,5 +510,7 @@ if st.button("Predict Virality 🔮"):
             st.markdown(reason)
 
         st.markdown("---")
-        st.caption("Based on patterns from 2091 r/technology posts. "
-                   "Model ROC AUC: 0.7833 — predictions are probabilistic not guaranteed.")
+        st.caption(
+            "Based on patterns from 2091 r/technology posts. "
+            "Model ROC AUC: 0.7833 — predictions are probabilistic not guaranteed."
+        )

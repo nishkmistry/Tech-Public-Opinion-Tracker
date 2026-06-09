@@ -29,26 +29,25 @@ jobs:
 
     - name: Run Reddit Scraper
       run: |
-        # Updated to reflect the new directory
+        # Runs from root, outputs raw data to data/ folder
         python Reddit_Scraper/reddit_scraper.py
 
     - name: Execute NLP & ML Pipeline Notebooks
       run: |
-        # Updated 'notebooks' to 'Notebooks' to match your folder capitalization
-        jupyter nbconvert --to notebook --execute --inplace Notebooks/Cleaning.ipynb
-        jupyter nbconvert --to notebook --execute --inplace Notebooks/Sentiment_analysis.ipynb
-        jupyter nbconvert --to notebook --execute --inplace Notebooks/nlp_features.ipynb
-        jupyter nbconvert --to notebook --execute --inplace Notebooks/feature_engineering.ipynb
-        jupyter nbconvert --to notebook --execute --inplace Notebooks/Virality.ipynb
-        jupyter nbconvert --to notebook --execute --inplace Notebooks/EDA_storytelling.ipynb
+        # Navigate into the Notebooks directory so relative paths (../data/) resolve correctly
+        cd Notebooks
+        jupyter nbconvert --to notebook --execute --inplace Cleaning.ipynb
+        jupyter nbconvert --to notebook --execute --inplace Sentiment_analysis.ipynb
+        jupyter nbconvert --to notebook --execute --inplace nlp_features.ipynb
+        jupyter nbconvert --to notebook --execute --inplace feature_engineering.ipynb
+        jupyter nbconvert --to notebook --execute --inplace Virality.ipynb
+        jupyter nbconvert --to notebook --execute --inplace EDA_storytelling.ipynb
 
     - name: Commit and Push Updated Data & Metrics
       run: |
-        git config --local user.email "github-actions[bot]@users.noreply.github.com"
-        git config --local user.name "github-actions[bot]"
+        git config --local user.email "nishkmistry@users.noreply.github.com"
+        git config --local user.name "data_pipeline[bot]"
         
-        # Stages the data directory for commit
         git add data/
-        
         git commit -m "Automated pipeline run: Updated data & insights $(date -u +'%Y-%m-%d %H:%M:%S' UTC)" || echo "No changes detected in data matrix."
         git push
