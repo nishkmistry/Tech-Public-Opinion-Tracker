@@ -37,7 +37,7 @@ jobs:
         jupyter nbconvert --to notebook --execute --inplace nlp_features.ipynb
         jupyter nbconvert --to notebook --execute --inplace feature_engineering.ipynb
         jupyter nbconvert --to notebook --execute --inplace Virality.ipynb
-        jupyter nbconvert --to notebook --execute --inplace EDA_storytelling.ipynb
+        jupyter nbconvert --to notebook --execute --inplace EDA_Storytelling.ipynb
 
     - name: Commit and Push Updated Data & Metrics
       run: |
