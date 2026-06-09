@@ -44,6 +44,6 @@ jobs:
         git config --local user.email "nishkmistry@users.noreply.github.com"
         git config --local user.name "data_pipeline[bot]"
         
-        git add ../data/
+        git add --all
         git commit -m "Automated pipeline run: Updated ML models & insights $(date -u +'%Y-%m-%d %H:%M:%S' UTC)" || echo "No changes detected."
         git push
