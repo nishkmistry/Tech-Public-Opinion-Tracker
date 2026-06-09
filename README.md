@@ -1,7 +1,9 @@
 # 🔍 Reddit Sentiment & Virality Analyzer — r/technology
 
-An end-to-end NLP and Machine Learning project that scrapes posts from r/technology, analyzes sentiment, discovers hidden topics, extracts named entities, and predicts whether a post will go viral — all without using the Reddit API.
+[![Data Pipeline & Deployment](https://github.com/nishkmistry/Tech-Public-Opinion-Tracker/actions/workflows/data_pipeline.yml/badge.svg)](https://github.com/nishkmistry/Tech-Public-Opinion-Tracker/actions/workflows/data_pipeline.yml)
+[![Code Quality & Maintenance](https://github.com/nishkmistry/Tech-Public-Opinion-Tracker/actions/workflows/ci_maintenance.yml/badge.svg)](https://github.com/nishkmistry/Tech-Public-Opinion-Tracker/actions/workflows/ci_maintenance.yml)
 
+An end-to-end NLP and Machine Learning project that scrapes posts from r/technology, analyzes sentiment, discovers hidden topics...
 ---
 
 ## 📌 Project Highlights
